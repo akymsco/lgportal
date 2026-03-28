@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Place - Kankara LG Portal</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0}
+body{background:#f5f7fa;color:#000}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:20px}
+nav{background:#0b5ed7;padding:10px;display:flex;flex-wrap:wrap;gap:10px}
+nav a{text-decoration:none;color:#fff;font-weight:600}
+.container{padding:15px}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:10px;margin-bottom:15px;transition:transform 0.2s, box-shadow 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.card h3{margin-top:0;cursor:pointer;}
+.button{display:inline-block;padding:5px 10px;margin-top:8px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;transition:background 0.2s;}
+.button:hover{background:#0747a6;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px}
+ul{padding-left:15px;margin:5px 0;list-style:none}
+li{margin:2px 0;padding:2px 5px;border-radius:4px;transition:background 0.2s;}
+li:hover{background:#e9ecef;}
+.polling-unit{display:inline-block;padding:2px 6px;margin:1px;border-radius:4px;color:white;font-size:0.85em;}
+.polling-high{background:#e74c3c;}    
+.polling-medium{background:#f39c12;}  
+.polling-low{background:#27ae60;}     
+
+/* DARK MODE */
+body.dark{background:#121212;color:white}
+body.dark .card{background:#1e1e1e}
+body.dark nav{background:#1e1e1e}
+body.dark li:hover{background:#2a2a2a;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="title">About Kankara</h1>
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="people.html">People</a>
+<a href="projects.html">Projects</a>
+<a href="blog.html">News</a>
+</nav>
+
+<div class="container" id="box"></div>
+
+<script>
+// Language
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const UI_LANG = {
+ en:{title:"About Kankara", district:"District", ward:"Ward", pollingUnits:"Polling Units", summary:"Summary", generalInfo:"General Info", history:"History", readMore:"Read More", hide:"Hide"},
+ ha:{title:"Bayanin Kankara", district:"Gunduma", ward:"Unguwa/Ward", pollingUnits:"Rukunin Zabe", summary:"Jimlar Bayani", generalInfo:"Bayanin Gabaɗaya", history:"Tarihi", readMore:"Kara Bayani", hide:"Rufe"}
+};
+function applyLang(){ document.getElementById("title").innerText = UI_LANG[lang].title; document.documentElement.lang = lang; }
+
+// Dark Mode
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark")}
+function toggleDark(){ const isDark=document.body.classList.toggle("dark"); localStorage.setItem("dark",isDark?"1":"0"); }
+
+// Kankara Data
+const getData=(key)=>JSON.parse(localStorage.getItem(key)) || [
+{
+ area:"1025 km²",
+ zip:"830212",
+ history:{
+  en:"Kankara is a Local Government Area in Katsina State, Nigeria. It has two main districts and 11 wards.",
+  ha:"Kankara karamar hukuma ce a Jihar Katsina, Najeriya. Tana da gundumomi biyu da unguwanni 11."
+ },
+ wards:[
+  {name:{en:"Burdugau", ha:"Burdugau"}, district:"Kankara District"},
+  {name:{en:"Danmaidaki", ha:"Danmaidaki"}, district:"Kankara District"},
+  {name:{en:"Garagi", ha:"Garagi"}, district:"Kankara District"},
+  {name:{en:"Gundawa", ha:"Gundawa"}, district:"Kankara District"},
+  {name:{en:"Gurbi", ha:"Gurbi"}, district:"Kankara District"},
+  {name:{en:"Kankara", ha:"Kankara"}, district:"Kankara District"},
+  {name:{en:"Ketare", ha:"Ketare"}, district:"Ketare District"},
+  {name:{en:"Kuka Sheka", ha:"Kuka Sheka"}, district:"Ketare District"},
+  {name:{en:"Mabai", ha:"Mabai"}, district:"Ketare District"},
+  {name:{en:"Pauwa", ha:"Pauwa"}, district:"Ketare District"},
+  {name:{en:"Zango Zabaro", ha:"Zango Zabaro"}, district:"Ketare District"}
+ ],
+ districts:[
+  {name:{en:"Kankara District", ha:"Gundumar Kankara"}},
+  {name:{en:"Ketare District", ha:"Gundumar Ketare"}}
+ ]
+}
+];
+
+// Polling Units
+const POLLING_UNIT_NAMES = {
+"Burdugau":["Agangaro – Agangaro","Burdugau I – Pri.school","Burdugau II – Pri.school","Dan Barmo – Pri.school","Dan Kakuru – K/G Mai Ung","Dan Lawal A&B Project","Dankalgo A&B K/G Maiung","Dorawa I – Tasha","Dorawa II – K/G Sani Sarki","Gobirawa K/Gidan Mai Unguwa","Kurba I – Pri.school","Kurba II – K/G Mai Ung","Mai Kawo I – Pri.school","Mai Sabulu – K/G Mai Ung","Santar Kaku – Pri.school","Sharada I – K/G Mai Ung","Sharada II – K/G A G Sallau"],
+"Danmaidaki":["Gureta – Gidan Mai Unguwa","Kwankwalwa Gidan Mai Unguwa","Sabon Gidan – Gidi Bedi","Danmarke I – Pri.school","Dan Marke Iia – Dispensary","Dan Marke Iib – Dispensary","Dan Marke Iia Tsamiya","Dan Marke (Yalwa) I.V Yalwa","Dan Marke Iib Islamaiya","Katsinawa – Masallachi","Tsaunin Goda – Gidan Mai Ung","Gidan Daudu – Gidan Daudu","Yargoje I A – Pri.school","Yargoje II – Dispensary","Yargoje III – Clinic","Yar Goje IV – Kofar Fada","Zinari / Pry. Sch.","Gidan Boka – Gidan Boka","Ruwan Tukurwa I – Pri.school","Ruwan Tukurwa II – K/G Ranau","Ung Tofa – K/G Ung Maiung","Ung Kwari – Ung Kwari","Yar Goje II – Dispensary","Yargoje V – Bakin Kasuwa"],
+"Garagi":["Batsirari – K/G Mai Ung","Garagi – K/G Mai Ung","Gobirawa – K/G Mai Ung","Mai Here – Gidan Mai Ung","Nagamda – Filin Masallachi","Naganda/Amarawa – K/G Maiung","Sabon Gari – K/G Mai Ung","Santar Amadi – Santar Amadi","Tsamiya Jino III – K/G Mai Ung","Tsamiyar Jino II – Comm.Building","Tsamiyar Jino – Pri.school","Ung Rabo – Ung Rabo/K/U","Ung S.Aiki – K/G Ung","Zagalle – K/G Mai Ung"],
+"Gundawa":["Gundawa I – Pri.school","Gundawa II – K/G Mai Ung","Gundawa III – Dispensary","Gundawa IV – K/G Sarkin Fada","Gundawa V – Pri.school"],
+"Gurbi":["Gurbi I – Pri.school","Gurbi II – K/G Mai Ung","Gurbi III – Pri.school","Gurbi IV – K/G Mai Ung","Gurbi V – Pri.school"],
+"Kankara":["Kankara I – Pri.school","Kankara II – K/G Mai Ung","Kankara III – Pri.school","Kankara IV – K/G Mai Ung"],
+"Ketare":["Ketare I – Pri.school","Ketare II – Pri.school","Ketare III – Model Pri.school"],
+"Kuka Sheka":["Kuka Sheka I – Pri.school","Kuka Sheka II – K/G Mai Ung","Kuka Sheka III – Pri.school","Kuka Sheka IV – K/G Mai Ung"],
+"Mabai":["Mabai I – Pri.school","Mabai II – Pri.school","Mabai III – K/G Mai Ung"],
+"Pauwa":["Pauwa I – Pri.school","Pauwa II – Dispensary","Pauwa III – K/G Mai Ung"],
+"Zango Zabaro":["Zango I – Pri.school","Zango II – Pri.school","Zango III – K/G Mai Ung","Makera – K/G Mai Ung","Dansabau I – T.V Viewing Centre","Dansabau II – K/G Mai Ung","Danmarke Z. – K/Gidan Mai Ung","Areda I – Pri.school","Areda II – K/Gidan Mai Ung","Dakamawa – K/G Dan Mai Ung","Santar Guraje I – Pri.school","Santar Guraje II – Pri.school","Tanimawa – Pri.school","Kabuke – K/G Mai Ung","Saliihawa – K/G Mai Ung","Santar Nakanti – K/G Mai Ung","Bela – K/mai Ung","Bakkai – Pri.school","Gidan Damo – K/G Mai Ung","Dan Yaroji – K/G Mai Ung","Sherere – K/G Mai Ung"]
+};
+
+// Helpers
+const t=(obj)=>typeof obj==="string"?obj:obj?.[lang]||obj?.en||"";
+function getPUClass(count){if(count>=15) return "polling-high"; if(count>=8) return "polling-medium"; return "polling-low";}
+
+// Render
+function renderPlace(){
+ let d = getData("place")[0];
+ if(!d) return;
+ let totalPolling = d.wards.reduce((acc,w)=>acc + (POLLING_UNIT_NAMES[w.name.en]?.length || 0),0);
+
+ let html = `
+  <div class="card">
+    <h3>${UI_LANG[lang].summary}</h3>
+    <p>${UI_LANG[lang].district}: ${d.districts.length}</p>
+    <p>${UI_LANG[lang].ward}: ${d.wards.length}</p>
+    <p>${UI_LANG[lang].pollingUnits}: ${totalPolling}</p>
+  </div>
+  <div class="card">
+    <h3>${UI_LANG[lang].generalInfo}</h3>
+    <p>${lang==="ha"?"Yanki":"Area"}: ${d.area}</p>
+    <p>${lang==="ha"?"Lambar Zip":"Zip"}: ${d.zip}</p>
+  </div>
+  <div class="card">
+    <h3>${UI_LANG[lang].history}</h3>
+    <p>${t(d.history)}</p>
+  </div>
+
+  <h2>${UI_LANG[lang].district}</h2>
+  <div class="grid">
+    ${d.districts.map(dist=>`
+      <div class="card">
+        <h3>${t(dist.name)}</h3>
+        <button class="button readMore">${UI_LANG[lang].readMore}</button>
+        <div class="wards-grid" style="display:none;margin-top:10px;">
+          <div class="grid">
+            ${d.wards.filter(w=>w.district===dist.name.en).map(w=>{
+              const pus = POLLING_UNIT_NAMES[w.name.en] || [];
+              return `
+              <div class="card">
+                <h3>${t(w.name)}</h3>
+                <ul>
+                  ${pus.slice(0,4).map(pu=>`<li class="polling-unit ${getPUClass(pus.length)}">${pu}</li>`).join('')}
+                </ul>
+                ${pus.length>4?`
+                  <button class="button readMorePU">${UI_LANG[lang].readMore}</button>
+                  <ul class="morePU" style="display:none;margin-top:5px;">
+                    ${pus.slice(4).map(pu=>`<li class="polling-unit ${getPUClass(pus.length)}">${pu}</li>`).join('')}
+                  </ul>
+                `:""}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+ `;
+ document.getElementById("box").innerHTML = html;
+
+ // Toggles
+ document.querySelectorAll(".readMore").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const grid = btn.nextElementSibling;
+     const isVisible = grid.style.display==="block";
+     grid.style.display = isVisible ? "none" : "block";
+     btn.innerText = isVisible ? UI_LANG[lang].readMore : UI_LANG[lang].hide;
+   });
+ });
+ document.querySelectorAll(".readMorePU").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const more = btn.nextElementSibling;
+     const isVisible = more.style.display==="block";
+     more.style.display = isVisible ? "none" : "block";
+     btn.innerText = isVisible ? UI_LANG[lang].readMore : UI_LANG[lang].hide;
+   });
+ });
+}
+
+applyLang();
+renderPlace();
+</script>
+
+</body>
+</html>

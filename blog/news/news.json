@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": {"en":"Road Project Flagged Off","ha":"An fara aikin hanya"},
+    "img":"../../assets/images/road.jpg",
+    "date":"2026-03-15"
+  },
+  {
+    "id": 2,
+    "title": {"en":"Health Center Opened","ha":"An bude asibiti"},
+    "img":"../../assets/images/health.jpg",
+    "date":"2026-03-10"
+  },
+  {
+    "id": 3,
+    "title": {"en":"Education Program","ha":"Shirin ilimi"},
+    "img":"../../assets/images/school.jpg",
+    "date":"2026-03-01"
+  },
+  {
+    "id": 4,
+    "title": {"en":"Water Project Completed","ha":"An kammala ruwa"},
+    "img":"../../assets/images/water.jpg",
+    "date":"2026-02-20"
+  }
+]

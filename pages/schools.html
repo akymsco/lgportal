@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schools - Kankara LG Portal</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+body{background:#f5f7fa;color:#000;}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+header h1{margin:0;font-size:20px;}
+nav{background:#0b5ed7;padding:10px;display:flex;flex-wrap:wrap;gap:10px;}
+nav a{text-decoration:none;color:#fff;font-weight:600;}
+.container{padding:15px;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:10px;margin-bottom:15px;transition:transform 0.2s, box-shadow 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.card h3{margin-top:0;cursor:pointer;}
+.button{display:inline-block;padding:5px 10px;margin-top:8px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;transition:background 0.2s;}
+.button:hover{background:#0747a6;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px;}
+ul{padding-left:15px;margin:5px 0;list-style:none;}
+li{margin:2px 0;padding:2px 5px;border-radius:4px;transition:background 0.2s;}
+li:hover{background:#e9ecef;}
+
+/* Dark Mode */
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+body.dark li:hover{background:#2a2a2a;}
+
+/* Filters */
+.filters{margin-bottom:15px;display:flex;flex-wrap:wrap;gap:10px;}
+.filters select{padding:5px;border-radius:6px;border:1px solid #ccc;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="title">Schools</h1>
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="people.html">People</a>
+<a href="place.html">Place</a>
+<a href="projects.html">Projects</a>
+</nav>
+
+<div class="container">
+<div class="filters">
+  <select id="wardFilter"><option value="">All Wards</option></select>
+  <select id="typeFilter"><option value="">All Types</option></select>
+</div>
+<div id="box" class="grid"></div>
+</div>
+
+<script>
+// Language
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const UI_LANG = {
+ en:{title:"Schools", readMore:"Read More", hide:"Hide"},
+ ha:{title:"Makarantu", readMore:"Kara Bayani", hide:"Rufe"}
+};
+function applyLang(){ document.getElementById("title").innerText = UI_LANG[lang].title; document.documentElement.lang = lang; }
+
+// Dark Mode
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark")}
+function toggleDark(){ const isDark=document.body.classList.toggle("dark"); localStorage.setItem("dark",isDark?"1":"0"); }
+
+// Schools Data
+const SCHOOLS = [
+  // Burdugau Ward
+  {name:{en:"Agangaro – Agangaro", ha:"Agangaro – Agangaro"}, type:"Other", ward:"Burdugau", desc:{en:"Local facility", ha:"Wurin gida"}},
+  {name:{en:"Burdugau I Primary School", ha:"Makarantar Firamare Burdugau I"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Burdugau II Primary School", ha:"Makarantar Firamare Burdugau II"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Dan Barmo Primary School", ha:"Makarantar Firamare Dan Barmo"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Dan Kakuru – K/G Mai Ung", ha:"Dan Kakuru – K/G Mai Ung"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Dan Lawal A&B Project", ha:"Dan Lawal A&B Project"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Dankalgo A&B K/G Maiung", ha:"Dankalgo A&B K/G Maiung"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Dorawa I – Tasha", ha:"Dorawa I – Tasha"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Dorawa II – K/G Sani Sarki", ha:"Dorawa II – K/G Sani Sarki"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Gobirawa K/Gidan Mai Unguwa", ha:"Gobirawa K/Gidan Mai Unguwa"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Kurba I Primary School", ha:"Makarantar Firamare Kurba I"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Kurba II – K/G Mai Ung", ha:"Kurba II – K/G Mai Ung"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Mai Kawo I Primary School", ha:"Makarantar Firamare Mai Kawo I"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Mai Sabulu – K/G Mai Ung", ha:"Mai Sabulu – K/G Mai Ung"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Santar Kaku Primary School", ha:"Makarantar Firamare Santar Kaku"}, type:"Primary", ward:"Burdugau", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Sharada I – K/G Mai Ung", ha:"Sharada I – K/G Mai Ung"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Sharada II – K/G A G Sallau", ha:"Sharada II – K/G A G Sallau"}, type:"Other", ward:"Burdugau", desc:{en:"Other facility", ha:"Wurin gida"}},
+
+  // Danmaidaki Ward
+  {name:{en:"Danmaidaki Primary School", ha:"Makarantar Firamare Danmaidaki"}, type:"Primary", ward:"Danmaidaki", desc:{en:"Local primary school", ha:"Makarantar firamare ta gida"}},
+  {name:{en:"Gureta – Gidan Mai Unguwa", ha:"Gureta – Gidan Mai Unguwa"}, type:"Other", ward:"Danmaidaki", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Kwankwalwa Gidan Mai Unguwa", ha:"Kwankwalwa Gidan Mai Unguwa"}, type:"Other", ward:"Danmaidaki", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Sabon Gidan – Gidi Bedi", ha:"Sabon Gidan – Gidi Bedi"}, type:"Other", ward:"Danmaidaki", desc:{en:"Other facility", ha:"Wurin gida"}},
+  {name:{en:"Danmarke I Primary School", ha:"Makarantar Firamare Danmarke I"}, type:"Primary", ward:"Danmaidaki", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Yargoje I A Primary School", ha:"Makarantar Firamare Yargoje I A"}, type:"Primary", ward:"Danmaidaki", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Zinari Primary School", ha:"Makarantar Firamare Zinari"}, type:"Primary", ward:"Danmaidaki", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Ruwan Tukurwa I Primary School", ha:"Makarantar Firamare Ruwan Tukurwa I"}, type:"Primary", ward:"Danmaidaki", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Garagi Ward
+  {name:{en:"Tsamiyar Jino – Pri.school", ha:"Makarantar Firamare Tsamiyar Jino"}, type:"Primary", ward:"Garagi", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Gurbi Ward
+  {name:{en:"Gurbi I Primary School", ha:"Makarantar Firamare Gurbi I"}, type:"Primary", ward:"Gurbi", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Kankara Ward
+  {name:{en:"Kankara I Primary School", ha:"Makarantar Firamare Kankara I"}, type:"Primary", ward:"Kankara", desc:{en:"Primary education", ha:"Makarantar firamare"}},
+  {name:{en:"Government Science Secondary School Kankara", ha:"Makarantar Sakandare Kimiyya Kankara"}, type:"Secondary", ward:"Kankara", desc:{en:"Special science school", ha:"Makarantar kimiyya ta musamman"}},
+
+  // Ketare Ward
+  {name:{en:"Ketare I Primary School", ha:"Makarantar Firamare Ketare I"}, type:"Primary", ward:"Ketare", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Ketare II Primary School", ha:"Makarantar Firamare Ketare II"}, type:"Primary", ward:"Ketare", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+  {name:{en:"Ketare III Model Primary School", ha:"Makarantar Firamare Ketare III"}, type:"Primary", ward:"Ketare", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Kuka Sheka Ward
+  {name:{en:"Kuka Sheka I Primary School", ha:"Makarantar Firamare Kuka Sheka I"}, type:"Primary", ward:"Kuka Sheka", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Mabai Ward
+  {name:{en:"Mabai I Primary School", ha:"Makarantar Firamare Mabai I"}, type:"Primary", ward:"Mabai", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Pauwa Ward
+  {name:{en:"Pauwa I Primary School", ha:"Makarantar Firamare Pauwa I"}, type:"Primary", ward:"Pauwa", desc:{en:"Primary school", ha:"Makarantar firamare"}},
+
+  // Zango Zabaro Ward
+  {name:{en:"Zango I Primary School", ha:"Makarantar Firamare Zango I"}, type:"Primary", ward:"Zango Zabaro", desc:{en:"Primary school", ha:"Makarantar firamare"}}
+];
+// Populate filters
+const wardSelect = document.getElementById("wardFilter");
+const typeSelect = document.getElementById("typeFilter");
+const wards = [...new Set(SCHOOLS.map(s=>s.ward))];
+const types = [...new Set(SCHOOLS.map(s=>s.type))];
+wards.forEach(w=>wardSelect.innerHTML += `<option value="${w}">${w}</option>`);
+types.forEach(t=>typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+// Render Schools
+function renderSchools(){
+ const wardVal = wardSelect.value;
+ const typeVal = typeSelect.value;
+ const filtered = SCHOOLS.filter(s=>{
+   return (!wardVal || s.ward===wardVal) && (!typeVal || s.type===typeVal);
+ });
+
+ let html = '<div class="grid">';
+ filtered.forEach(s=>{
+   html += `
+   <div class="card">
+     <h3>${s.name[lang]}</h3>
+     <p>Type: ${s.type}</p>
+     <p>Ward: ${s.ward}</p>
+     ${s.desc?`<button class="button readMore">${UI_LANG[lang].readMore}</button>
+     <p class="desc" style="display:none;margin-top:5px;">${s.desc[lang]}</p>`:""}
+   </div>`;
+ });
+ html += '</div>';
+ document.getElementById("box").innerHTML = html;
+
+ // Read More toggle
+ document.querySelectorAll(".readMore").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const p = btn.nextElementSibling;
+     const isVisible = p.style.display==="block";
+     p.style.display = isVisible?"none":"block";
+     btn.innerText = isVisible?UI_LANG[lang].readMore:UI_LANG[lang].hide;
+   });
+ });
+}
+
+// Filters change
+wardSelect.addEventListener("change", renderSchools);
+typeSelect.addEventListener("change", renderSchools);
+
+applyLang();
+renderSchools();
+</script>
+
+</body>
+</html>

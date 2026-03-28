@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kankara LG Portal - Official Website</title>
+
+<meta name="description" content="Official digital portal of Kankara Local Government.">
+
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+
+body{background:#f5f7fa;color:#000;}
+
+/* HEADER */
+header{
+background:#0b5ed7;
+color:#fff;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h1{font-size:18px;}
+
+.controls button{
+margin-left:5px;
+padding:5px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+font-size:22px;
+cursor:pointer;
+background:none;
+border:none;
+color:white;
+}
+
+/* NAV (HIDDEN BY DEFAULT) */
+nav{
+background:#0b5ed7;
+display:none;
+flex-direction:column;
+padding:10px;
+}
+
+nav a{
+color:#fff;
+text-decoration:none;
+padding:10px;
+border-radius:6px;
+}
+
+nav a:hover{
+background:rgba(255,255,255,0.2);
+}
+
+/* SHOW MENU */
+nav.show{
+display:flex;
+}
+
+/* CONTENT */
+.container{
+padding:20px;
+max-width:1000px;
+margin:auto;
+text-align:center;
+}
+
+.card-links{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.card{
+background:#fff;
+padding:15px;
+border-radius:12px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+cursor:pointer;
+transition:.2s;
+}
+
+.card:hover{transform:translateY(-3px);}
+
+/* FOOTER */
+footer{
+margin-top:30px;
+padding:20px;
+text-align:center;
+background:#0b5ed7;
+color:#fff;
+}
+
+footer a{
+color:#fff;
+margin:0 10px;
+text-decoration:none;
+font-size:18px;
+}
+
+/* DARK MODE */
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Kankara LG</h1>
+
+<div>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+<span class="controls">
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</span>
+</div>
+
+</header>
+
+<!-- TOGGLE NAV -->
+<nav id="navMenu">
+<a href="index.html">Home</a>
+<a href="blog/news/news.html">📰 News</a>
+<a href="pages/projects.html">🏗 Projects</a>
+<a href="pages/people.html">👥 People</a>
+<a href="pages/place.html">📍 Places</a>
+<a href="pages/schools.html">🏫 Schools</a>
+<a href="pages/offices.html">🏢 Offices</a>
+<a href="pages/companies.html">🏬 Companies</a>
+<a href="pages/organizations.html">🏛 Organizations</a>
+</nav>
+
+<div class="container">
+
+<h2 id="title">Welcome to Kankara LG</h2>
+<p id="desc">Official digital portal for information, projects and public services.</p>
+
+
+<div class="card-links">
+<div class="card" onclick="go('pages/blog.html')">📰 News</div>
+<div class="card" onclick="go('pages/projects.html')">🏗 Projects</div>
+<div class="card" onclick="go('pages/schools.html')">🏫 Schools</div>
+<div class="card" onclick="go('pages/offices.html')">🏢 Offices</div>
+<div class="card" onclick="go('pages/people.html')">👥 People</div>
+<div class="card" onclick="go('pages/place.html')">📍 Places</div>
+</div>
+
+</div>
+
+<footer>
+<p>© 2026 Kankara Local Government</p>
+
+<div>
+<a href="#">🌐</a>
+<a href="#">📘</a>
+<a href="#">🐦</a>
+<a href="#">📸</a>
+<a href="#">▶️</a>
+</div>
+</footer>
+
+<script>
+
+// LANGUAGE
+const lang = localStorage.getItem("lang") || "en";
+
+function setLang(l){
+ localStorage.setItem("lang", l);
+ location.reload();
+}
+
+const TEXT = {
+ en:{
+   title:"Welcome to Kankara LG",
+   desc:"Official digital portal for information, projects and public services."
+ },
+ ha:{
+   title:"Barka da zuwa Kankara LG",
+   desc:"Shafin hukuma na bayanai, ayyuka da hidimomin jama'a."
+ }
+};
+
+document.getElementById("title").innerText = TEXT[lang].title;
+document.getElementById("desc").innerText = TEXT[lang].desc;
+
+// DARK MODE
+if(localStorage.getItem("dark")==="1"){
+ document.body.classList.add("dark");
+}
+
+function toggleDark(){
+ const d = document.body.classList.toggle("dark");
+ localStorage.setItem("dark", d ? "1":"0");
+}
+
+// NAVIGATION
+function go(url){
+ window.location.href = url;
+}
+
+// TOGGLE MENU
+function toggleMenu(){
+ const nav = document.getElementById("navMenu");
+ nav.classList.toggle("show");
+}
+
+</script>
+
+</body>
+</html>

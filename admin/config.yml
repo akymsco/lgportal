@@ -1,0 +1,22 @@
+backend:
+  name: github
+  repo: YOUR_USERNAME/lgportal
+  branch: main
+
+media_folder: "public/assets/images"
+public_folder: "/assets/images"
+
+collections:
+  - name: "news"
+    label: "News"
+    folder: "public/blog/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+
+    fields:
+      - {label: "Title (EN)", name: "title_en", widget: "string"}
+      - {label: "Title (HA)", name: "title_ha", widget: "string"}
+      - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "Image", name: "img", widget: "image"}
+      - {label: "Content (EN)", name: "content_en", widget: "text"}
+      - {label: "Content (HA)", name: "content_ha", widget: "text"}

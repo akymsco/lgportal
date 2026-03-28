@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offices - Kankara LG Portal</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+body{background:#f5f7fa;color:#000;}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+header h1{margin:0;font-size:20px;}
+nav{background:#0b5ed7;padding:10px;display:flex;flex-wrap:wrap;gap:10px;}
+nav a{text-decoration:none;color:#fff;font-weight:600;}
+.container{padding:15px;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:10px;margin-bottom:15px;transition:transform 0.2s, box-shadow 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.card img{width:100%;border-radius:8px;margin-bottom:8px;}
+.card h3{margin-top:0;cursor:pointer;}
+.button{display:inline-block;padding:5px 10px;margin-top:8px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;transition:background 0.2s;}
+.button:hover{background:#0747a6;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px;}
+ul{padding-left:15px;margin:5px 0;list-style:none;}
+li{margin:2px 0;padding:2px 5px;border-radius:4px;transition:background 0.2s;}
+li:hover{background:#e9ecef;}
+
+/* Dark Mode */
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+body.dark li:hover{background:#2a2a2a;}
+
+/* Filters */
+.filters{margin-bottom:15px;display:flex;flex-wrap:wrap;gap:10px;}
+.filters select{padding:5px;border-radius:6px;border:1px solid #ccc;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="title">Government Offices</h1>
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="people.html">People</a>
+<a href="place.html">Place</a>
+<a href="projects.html">Projects</a>
+<a href="schools.html">Schools</a>
+</nav>
+
+<div class="container">
+<div class="filters">
+  <select id="wardFilter"><option value="">All Wards</option></select>
+  <select id="typeFilter"><option value="">All Types</option></select>
+</div>
+<div id="box" class="grid"></div>
+</div>
+
+<script>
+// Language
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const UI_LANG = {
+ en:{title:"Government Offices", readMore:"Read More", hide:"Hide"},
+ ha:{title:"Ofisoshin Gwamnati", readMore:"Kara Bayani", hide:"Rufe"}
+};
+function applyLang(){ document.getElementById("title").innerText = UI_LANG[lang].title; document.documentElement.lang = lang; }
+
+// Dark Mode
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark")}
+function toggleDark(){ const isDark=document.body.classList.toggle("dark"); localStorage.setItem("dark",isDark?"1":"0"); }
+
+// Offices Data with images
+const OFFICES = [
+ {name:{en:"Local Government Secretariat Kankara", ha:"Ofishin Kwamiti na Kankara"}, type:"Administrative", ward:"Kankara", img:"../assets/images/lg-secretariat.jpg", desc:{en:"Main LGA administrative office", ha:"Babban ofishin gudanarwa na Kankara"}},
+ {name:{en:"Health Center Burdugau", ha:"Cibiyar Lafiya Burdugau"}, type:"Health", ward:"Burdugau", img:"../assets/images/health-burdugau.jpg", desc:{en:"Primary health services", ha:"Cibiyar lafiya ta farko"}},
+ {name:{en:"Police Station Kankara", ha:"Sashen 'Yan Sanda Kankara"}, type:"Security", ward:"Kankara", img:"../assets/images/police-kankara.jpg", desc:{en:"Local police station", ha:"Ofishin 'yan sanda na gida"}},
+ {name:{en:"Post Office Danmaidaki", ha:"Ofishin Wasiku Danmaidaki"}, type:"Postal", ward:"Danmaidaki", img:"../assets/images/postoffice-danmaidaki.jpg", desc:{en:"Mail services", ha:"Sabis na wasiku"}},
+ {name:{en:"Community Health Post Gurbi", ha:"Cibiyar Lafiya ta Gurbi"}, type:"Health", ward:"Gurbi", img:"../assets/images/health-gurbi.jpg", desc:{en:"Basic healthcare services", ha:"Sabis na lafiya na farko"}},
+ {name:{en:"Agricultural Office Kuka Sheka", ha:"Ofishin Noma Kuka Sheka"}, type:"Agriculture", ward:"Kuka Sheka", img:"../assets/images/agriculture-kuka.jpg", desc:{en:"Support for farmers", ha:"Tallafi ga manoma"}},
+ {name:{en:"Education Office Mabai", ha:"Ofishin Ilimi Mabai"}, type:"Education", ward:"Mabai", img:"../assets/images/education-mabai.jpg", desc:{en:"Local education administration", ha:"Gudanarwa na ilimi"}},
+ {name:{en:"Water Supply Office Zango Zabaro", ha:"Ofishin Ruwa Zango Zabaro"}, type:"Utilities", ward:"Zango Zabaro", img:"../assets/images/water-zango.jpg", desc:{en:"Water supply services", ha:"Sabis na ruwa"}}
+];
+
+// Populate filters
+const wardSelect = document.getElementById("wardFilter");
+const typeSelect = document.getElementById("typeFilter");
+const wards = [...new Set(OFFICES.map(o=>o.ward))];
+const types = [...new Set(OFFICES.map(o=>o.type))];
+wards.forEach(w=>wardSelect.innerHTML += `<option value="${w}">${w}</option>`);
+types.forEach(t=>typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+// Render Offices
+function renderOffices(){
+ const wardVal = wardSelect.value;
+ const typeVal = typeSelect.value;
+ const filtered = OFFICES.filter(o=>{
+   return (!wardVal || o.ward===wardVal) && (!typeVal || o.type===typeVal);
+ });
+
+ let html = '<div class="grid">';
+ filtered.forEach(o=>{
+   html += `
+   <div class="card">
+     ${o.img?`<img src="${o.img}" alt="${o.name[lang]}">`:""}
+     <h3>${o.name[lang]}</h3>
+     <p>Type: ${o.type}</p>
+     <p>Ward: ${o.ward}</p>
+     ${o.desc?`<button class="button readMore">${UI_LANG[lang].readMore}</button>
+     <p class="desc" style="display:none;margin-top:5px;">${o.desc[lang]}</p>`:""}
+   </div>`;
+ });
+ html += '</div>';
+ document.getElementById("box").innerHTML = html;
+
+ // Read More toggle
+ document.querySelectorAll(".readMore").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const p = btn.nextElementSibling;
+     const isVisible = p.style.display==="block";
+     p.style.display = isVisible?"none":"block";
+     btn.innerText = isVisible?UI_LANG[lang].readMore:UI_LANG[lang].hide;
+   });
+ });
+}
+
+// Filters change
+wardSelect.addEventListener("change", renderOffices);
+typeSelect.addEventListener("change", renderOffices);
+
+applyLang();
+renderOffices();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Details</title>
+
+<style>
+body{font-family:system-ui;background:#f5f7fa;margin:0;}
+header{background:#0b5ed7;color:#fff;padding:15px;}
+.container{padding:15px;max-width:800px;margin:auto;}
+
+h2{margin-bottom:10px;}
+.meta{font-size:13px;color:#666;margin-bottom:10px;}
+img{width:100%;border-radius:10px;margin:10px 0;}
+</style>
+</head>
+
+<body>
+
+<header><h2>News</h2></header>
+
+<div class="container" id="newsDetail"></div>
+
+<script>
+
+// DATA
+const NEWS = [
+{id:1,title:"Chairman Flags Off Road Project",content:"Full details of road project...",date:"2026-02-01"},
+{id:2,title:"New Health Center Commissioned",content:"Health center details...",date:"2026-02-10"},
+{id:3,title:"Education Support Program Launched",content:"Education program details...",date:"2026-03-01"}
+];
+
+// GET ID
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+const news = NEWS.find(n=>n.id==id);
+
+// RENDER
+if(news){
+ document.getElementById("newsDetail").innerHTML = `
+  <h2>${news.title}</h2>
+  <div class="meta">📅 ${news.date}</div>
+  <p>${news.content}</p>
+ `;
+}else{
+ document.getElementById("newsDetail").innerHTML = "<p>News not found</p>";
+}
+
+</script>
+
+</body>
+</html>

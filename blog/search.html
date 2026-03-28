@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search</title>
+
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+
+body{background:#f5f7fa;color:#000;}
+
+header{
+background:#0b5ed7;
+color:#fff;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.container{
+padding:15px;
+max-width:1000px;
+margin:auto;
+}
+
+.search-box{
+display:flex;
+gap:10px;
+margin-bottom:15px;
+}
+
+.search-box input{
+flex:1;
+padding:10px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.search-box button{
+padding:10px;
+border:none;
+background:#0b5ed7;
+color:#fff;
+border-radius:6px;
+cursor:pointer;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:15px;
+}
+
+.card{
+background:#fff;
+border-radius:12px;
+padding:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+cursor:pointer;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+.card img{
+width:100%;
+height:140px;
+object-fit:cover;
+border-radius:8px;
+margin-bottom:8px;
+}
+
+.meta{
+font-size:12px;
+color:#666;
+}
+
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark .meta{color:#ccc;}
+
+.breadcrumb{
+font-size:14px;
+margin-bottom:10px;
+}
+
+.breadcrumb a{
+text-decoration:none;
+color:#0b5ed7;
+font-weight:600;
+}
+
+.breadcrumb span{
+color:#666;
+margin:0 5px;
+}
+
+body.dark .breadcrumb a{color:#66aaff;}
+body.dark .breadcrumb span{color:#aaa;}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2 id="title">Search</h2>
+
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<div class="container">
+
+<a href="blog.html">← Back to Blog</a>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search posts...">
+<button onclick="search()">Search</button>
+</div>
+
+<div id="results" class="grid"></div>
+
+</div>
+
+<script>
+
+// =======================
+// LANGUAGE
+// =======================
+const lang = localStorage.getItem("lang") || "en";
+
+function setLang(l){
+ localStorage.setItem("lang",l);
+ location.reload();
+}
+
+const TEXT = {
+ en:{title:"Search", placeholder:"Search posts...", none:"No results found"},
+ ha:{title:"Bincike", placeholder:"Nemo labarai...", none:"Babu sakamako"}
+};
+
+document.getElementById("title").innerText = TEXT[lang].title;
+document.getElementById("searchInput").placeholder = TEXT[lang].placeholder;
+
+// =======================
+// DARK MODE
+// =======================
+if(localStorage.getItem("dark")==="1"){
+ document.body.classList.add("dark");
+}
+
+function toggleDark(){
+ const d = document.body.classList.toggle("dark");
+ localStorage.setItem("dark", d?"1":"0");
+}
+
+// =======================
+// DATA
+// =======================
+const POSTS = [
+ {id:1,title:{en:"Commissioning of School Project",ha:"Kaddamar da Makaranta"},img:"../assets/images/school.jpg",date:"2026-01-10",category:"Education"},
+ {id:2,title:{en:"Healthcare Improvement",ha:"Inganta Lafiya"},img:"../assets/images/health.jpg",date:"2026-01-05",category:"Health"},
+ {id:3,title:{en:"Road Construction",ha:"Gina Hanya"},img:"../assets/images/road.jpg",date:"2026-02-01",category:"Infrastructure"},
+ {id:4,title:{en:"New Library",ha:"Sabuwar Library"},img:"../assets/images/library.jpg",date:"2026-02-10",category:"Education"}
+];
+
+// =======================
+// SEARCH FUNCTION
+// =======================
+function search(){
+
+ const q = document.getElementById("searchInput").value.toLowerCase();
+
+ const filtered = POSTS.filter(p =>
+   p.title.en.toLowerCase().includes(q) ||
+   p.title.ha.toLowerCase().includes(q) ||
+   p.category.toLowerCase().includes(q)
+ );
+
+ render(filtered);
+}
+
+// =======================
+// RENDER
+// =======================
+function render(data){
+
+ if(data.length === 0){
+   document.getElementById("results").innerHTML =
+     `<p>${TEXT[lang].none}</p>`;
+   return;
+ }
+
+ let html = "";
+
+ data.forEach(p=>{
+ html += `
+   <div class="card" onclick="openPost(${p.id})">
+     <img src="${p.img}">
+     <h3>${p.title[lang]}</h3>
+     <div class="meta">📅 ${p.date} | ${p.category}</div>
+   </div>
+ `;
+ });
+
+ document.getElementById("results").innerHTML = html;
+}
+
+// =======================
+// OPEN POST
+// =======================
+function openPost(id){
+ window.location.href = "post/post.html?id=" + id;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traditional Rulers - Kankara LG Portal</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+body{background:#f5f7fa;color:#000;}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+header h1{margin:0;font-size:20px;}
+nav{background:#0b5ed7;padding:10px;display:flex;flex-wrap:wrap;gap:10px;}
+nav a{text-decoration:none;color:#fff;font-weight:600;}
+.container{padding:15px;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:10px;margin-bottom:15px;transition:transform 0.2s, box-shadow 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.card img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
+.card h3{margin-top:0;cursor:pointer;}
+.button{display:inline-block;padding:5px 10px;margin-top:8px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;transition:background 0.2s;}
+.button:hover{background:#0747a6;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px;}
+ul{padding-left:15px;margin:5px 0;list-style:none;}
+li{margin:2px 0;padding:2px 5px;border-radius:4px;transition:background 0.2s;}
+li:hover{background:#e9ecef;}
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+body.dark li:hover{background:#2a2a2a;}
+.filters{margin-bottom:15px;display:flex;flex-wrap:wrap;gap:10px;}
+.filters select{padding:5px;border-radius:6px;border:1px solid #ccc;}
+.card a{display:block;margin-top:5px;color:#0b5ed7;text-decoration:none;}
+.card a:hover{color:#0747a6;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="title">Traditional Rulers</h1>
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="people.html">People</a>
+<a href="place.html">Place</a>
+<a href="projects.html">Projects</a>
+<a href="schools.html">Schools</a>
+<a href="offices.html">Offices</a>
+<a href="companies.html">Companies</a>
+<a href="organizations.html">Organizations</a>
+</nav>
+
+<div class="container">
+<div class="filters">
+  <select id="wardFilter"><option value="">All Wards</option></select>
+  <select id="typeFilter"><option value="">All Types</option></select>
+</div>
+<div id="box" class="grid"></div>
+</div>
+
+<script>
+// Language
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const UI_LANG = {
+ en:{title:"Traditional Rulers", readMore:"Read More", hide:"Hide"},
+ ha:{title:"Sarautun Gargajiya", readMore:"Kara Bayani", hide:"Rufe"}
+};
+function applyLang(){ document.getElementById("title").innerText = UI_LANG[lang].title; document.documentElement.lang = lang; }
+
+// Dark Mode
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark")}
+function toggleDark(){ const isDark=document.body.classList.toggle("dark"); localStorage.setItem("dark",isDark?"1":"0"); }
+
+// Traditional Rulers Data (Embedded base64 images)
+const TRADITIONAL_RULERS = [
+  {name:{en:"Emir of Kankara", ha:"Sarkin Kankara"}, type:"Emir", ward:"Kankara", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Traditional Emir of Kankara", ha:"Sarkin gargajiya na Kankara"}, link:"#"},
+  {name:{en:"District Head of Kankara", ha:"Dan Hakimi Kankara"}, type:"District Head", ward:"Kankara", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Oversees Kankara district", ha:"Dan Hakimi Kankara"}, link:"#"},
+  {name:{en:"District Head of Ketare", ha:"Dan Hakimi Ketare"}, type:"District Head", ward:"Ketare", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Oversees Ketare district", ha:"Dan Hakimi Ketare"}, link:"#"},
+  {name:{en:"Village Head of Burdugau", ha:"Hakimin Gari Burdugau"}, type:"Village Head", ward:"Burdugau", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Leads Burdugau village community", ha:"Hakimin al'umma Burdugau"}, link:"#"},
+  {name:{en:"Village Head of Gurbi", ha:"Hakimin Gari Gurbi"}, type:"Village Head", ward:"Gurbi", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Leads Gurbi village community", ha:"Hakimin al'umma Gurbi"}, link:"#"},
+  {name:{en:"Village Head of Mabai", ha:"Hakimin Gari Mabai"}, type:"Village Head", ward:"Mabai", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Leads Mabai village community", ha:"Hakimin al'umma Mabai"}, link:"#"},
+  {name:{en:"Village Head of Kuka Sheka", ha:"Hakimin Gari Kuka Sheka"}, type:"Village Head", ward:"Kuka Sheka", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Leads Kuka Sheka village community", ha:"Hakimin al'umma Kuka Sheka"}, link:"#"},
+  {name:{en:"Village Head of Pauwa", ha:"Hakimin Gari Pauwa"}, type:"Village Head", ward:"Pauwa", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", desc:{en:"Leads Pauwa village community", ha:"Hakimin al'umma Pauwa"}, link:"#"}
+];
+
+// Populate filters
+const wardSelect = document.getElementById("wardFilter");
+const typeSelect = document.getElementById("typeFilter");
+const wards = [...new Set(TRADITIONAL_RULERS.map(c=>c.ward))];
+const types = [...new Set(TRADITIONAL_RULERS.map(c=>c.type))];
+wards.forEach(w=>wardSelect.innerHTML += `<option value="${w}">${w}</option>`);
+types.forEach(t=>typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+// Render Rulers
+function renderRulers(){
+ const wardVal = wardSelect.value;
+ const typeVal = typeSelect.value;
+ const filtered = TRADITIONAL_RULERS.filter(c=>{
+   return (!wardVal || c.ward===wardVal) && (!typeVal || c.type===typeVal);
+ });
+
+ let html = '<div class="grid">';
+ filtered.forEach(c=>{
+   html += `
+   <div class="card">
+     <img src="${c.img}" alt="${c.name[lang]}">
+     <h3>${c.name[lang]}</h3>
+     <p>Type: ${c.type}</p>
+     <p>Ward: ${c.ward}</p>
+     ${c.desc?`<button class="button readMore">${UI_LANG[lang].readMore}</button>
+     <p class="desc" style="display:none;margin-top:5px;">${c.desc[lang]}</p>`:""}
+     ${c.link?`<a href="${c.link}" target="_blank">Visit Website</a>`:""}
+   </div>`;
+ });
+ html += '</div>';
+ document.getElementById("box").innerHTML = html;
+
+ document.querySelectorAll(".readMore").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const p = btn.nextElementSibling;
+     const isVisible = p.style.display==="block";
+     p.style.display = isVisible?"none":"block";
+     btn.innerText = isVisible?UI_LANG[lang].readMore:UI_LANG[lang].hide;
+   });
+ });
+}
+
+// Filters change
+wardSelect.addEventListener("change", renderRulers);
+typeSelect.addEventListener("change", renderRulers);
+
+applyLang();
+renderRulers();
+</script>
+
+</body>
+</html>

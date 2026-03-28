@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Edit News</title>
+
+<link rel="stylesheet" href="../assets/css/global.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Edit News</h2>
+
+    <input type="text" id="title_en"><br><br>
+    <input type="text" id="title_ha"><br><br>
+
+    <textarea id="content_en"></textarea><br><br>
+    <textarea id="content_ha"></textarea><br><br>
+
+    <input type="text" id="image" placeholder="image.jpg"><br><br>
+
+    <button class="btn" onclick="updateNews()">Update</button>
+
+    <p id="status"></p>
+  </div>
+
+</div>
+
+<script src="../assets/js/firebase.js"></script>
+<script src="admin.js"></script>
+
+<script>
+loadSingleNews();
+</script>
+
+</body>
+</html>

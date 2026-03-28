@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Islamic Groups - Kankara LG Portal</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+body{background:#f5f7fa;color:#000;}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+header h1{margin:0;font-size:20px;}
+nav{background:#0b5ed7;padding:10px;display:flex;flex-wrap:wrap;gap:10px;}
+nav a{text-decoration:none;color:#fff;font-weight:600;}
+.container{padding:15px;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:10px;margin-bottom:15px;transition:transform 0.2s, box-shadow 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.card img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
+.card h3{margin-top:0;cursor:pointer;}
+.button{display:inline-block;padding:5px 10px;margin-top:8px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;transition:background 0.2s;}
+.button:hover{background:#0747a6;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px;}
+ul{padding-left:15px;margin:5px 0;list-style:none;}
+li{margin:2px 0;padding:2px 5px;border-radius:4px;transition:background 0.2s;}
+li:hover{background:#e9ecef;}
+
+/* Dark Mode */
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+body.dark li:hover{background:#2a2a2a;}
+
+/* Filters */
+.filters{margin-bottom:15px;display:flex;flex-wrap:wrap;gap:10px;}
+.filters select{padding:5px;border-radius:6px;border:1px solid #ccc;}
+.card a{display:block;margin-top:5px;color:#0b5ed7;text-decoration:none;}
+.card a:hover{color:#0747a6;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="title">Islamic Groups</h1>
+<div>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="people.html">People</a>
+<a href="place.html">Place</a>
+<a href="projects.html">Projects</a>
+<a href="schools.html">Schools</a>
+<a href="offices.html">Offices</a>
+<a href="companies.html">Companies</a>
+<a href="organizations.html">Organizations</a>
+</nav>
+
+<div class="container">
+<div class="filters">
+  <select id="wardFilter"><option value="">All Wards</option></select>
+  <select id="typeFilter"><option value="">All Types</option></select>
+</div>
+<div id="box" class="grid"></div>
+</div>
+
+<script>
+// Language
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const UI_LANG = {
+ en:{title:"Islamic Groups", readMore:"Read More", hide:"Hide"},
+ ha:{title:"Kungiyoyin Musulunci", readMore:"Kara Bayani", hide:"Rufe"}
+};
+function applyLang(){ document.getElementById("title").innerText = UI_LANG[lang].title; document.documentElement.lang = lang; }
+
+// Dark Mode
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark")}
+function toggleDark(){ const isDark=document.body.classList.toggle("dark"); localStorage.setItem("dark",isDark?"1":"0"); }
+
+// Islamic Groups Data with embedded Base64 placeholders
+const ISLAMIC_GROUPS = [
+  {name:{en:"Islamic Youth Association Kankara", ha:"Kungiyar Matasa Musulmi Kankara"}, type:"Youth", ward:"Kankara", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Youth Islamic activities", ha:"Ayyukan matasa Musulmi"}, link:"https://example.com/kya"},
+  {name:{en:"Muslim Women Cooperative", ha:"Kungiyar Mata Musulmi"}, type:"Women", ward:"Burdugau", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Women empowerment and Islamic teachings", ha:"Karfin mata da koyarwar Musulunci"}, link:"https://example.com/mwc"},
+  {name:{en:"Qur'anic School Association", ha:"Kungiyar Makarantar Alkur'ani"}, type:"Education", ward:"Gurbi", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Supports Quranic schools and students", ha:"Taimakawa makarantu da daliban Alkur'ani"}, link:"https://example.com/qsa"},
+  {name:{en:"Mabai Islamic Foundation", ha:"Kungiyar Musulunci Mabai"}, type:"Philanthropy", ward:"Mabai", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Community support through Islamic programs", ha:"Tallafi ga al'umma ta ayyukan Musulunci"}, link:"https://example.com/mif"},
+  {name:{en:"Kuka Sheka Islamic Forum", ha:"Kungiyar Musulunci Kuka Sheka"}, type:"Development", ward:"Kuka Sheka", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Islamic community development projects", ha:"Ayyukan ci gaban al'umma na Musulunci"}, link:"https://example.com/ksif"},
+  {name:{en:"Izalatil Bidi’a Wa Ikamatus Sunnah", ha:"Izalatil Bidi’a Wa Ikamatus Sunnah"}, type:"Religious", ward:"Kankara", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Promotes authentic Islamic teachings", ha:"Tallafa koyarwar Musulunci ta gaskiya"}, link:"https://example.com/izalatil"},
+  {name:{en:"Mubazzamatul Fityanul Islam", ha:"Mubazzamatul Fityanul Islam"}, type:"Youth", ward:"Kankara", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Youth Islamic activities and guidance", ha:"Ayyukan matasa Musulmi da jagoranci"}, link:"https://example.com/mubazzamatul"},
+  {name:{en:"Fiyanu Islam Group", ha:"Fiyanu Islam Group"}, type:"Youth", ward:"Burdugau", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Youth development and Islamic teachings", ha:"Ci gaban matasa da koyarwar Musulunci"}, link:"https://example.com/fiyanu"},
+  {name:{en:"Young Muslim Group", ha:"Young Muslim Group"}, type:"Youth", ward:"Gurbi", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Promoting Islamic values among youth", ha:"Tallafawa matasa da darussan Musulunci"}, link:"https://example.com/ymg"},
+  {name:{en:"First Aid Group", ha:"First Aid Group"}, type:"Health", ward:"Mabai", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Islamic first aid and health initiatives", ha:"Ayyukan lafiya na Musulunci"}, link:"https://example.com/fag"},
+  {name:{en:"Lajntul Hisbah Council", ha:"Lajntul Hisbah Council"}, type:"Community", ward:"Kuka Sheka", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Community policing and guidance", ha:"Kula da al'umma da jagoranci"}, link:"https://example.com/lajntul"},
+  {name:{en:"Da Awa Group", ha:"Da Awa Group"}, type:"Youth", ward:"Pauwa", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt...", desc:{en:"Youth Islamic activities", ha:"Ayyukan matasa Musulmi"}, link:"https://example.com/daawa"}
+];
+
+// Populate filters
+const wardSelect = document.getElementById("wardFilter");
+const typeSelect = document.getElementById("typeFilter");
+const wards = [...new Set(ISLAMIC_GROUPS.map(c=>c.ward))];
+const types = [...new Set(ISLAMIC_GROUPS.map(c=>c.type))];
+wards.forEach(w=>wardSelect.innerHTML += `<option value="${w}">${w}</option>`);
+types.forEach(t=>typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+// Render Groups
+function renderGroups(){
+ const wardVal = wardSelect.value;
+ const typeVal = typeSelect.value;
+ const filtered = ISLAMIC_GROUPS.filter(c=>{
+   return (!wardVal || c.ward===wardVal) && (!typeVal || c.type===typeVal);
+ });
+
+ let html = '<div class="grid">';
+ filtered.forEach(c=>{
+   html += `
+   <div class="card">
+     <img src="${c.img}" alt="${c.name[lang]}">
+     <h3>${c.name[lang]}</h3>
+     <p>Type: ${c.type}</p>
+     <p>Ward: ${c.ward}</p>
+     ${c.desc?`<button class="button readMore">${UI_LANG[lang].readMore}</button>
+     <p class="desc" style="display:none;margin-top:5px;">${c.desc[lang]}</p>`:""}
+     ${c.link?`<a href="${c.link}" target="_blank">Visit Website</a>`:""}
+   </div>`;
+ });
+ html += '</div>';
+ document.getElementById("box").innerHTML = html;
+
+ document.querySelectorAll(".readMore").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const p = btn.nextElementSibling;
+     const isVisible = p.style.display==="block";
+     p.style.display = isVisible?"none":"block";
+     btn.innerText = isVisible?UI_LANG[lang].readMore:UI_LANG[lang].hide;
+   });
+ });
+}
+
+// Filters change
+wardSelect.addEventListener("change", renderGroups);
+typeSelect.addEventListener("change", renderGroups);
+
+applyLang();
+renderGroups();
+</script>
+
+</body>
+</html>

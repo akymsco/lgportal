@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Post</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+body{background:#f5f7fa;color:#000;}
+header{background:#0b5ed7;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:18px;}
+.controls button{margin-left:5px;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;}
+.container{padding:15px;max-width:800px;margin:auto;}
+.back{display:inline-block;margin-bottom:15px;text-decoration:none;color:#0b5ed7;font-weight:bold;}
+.meta{font-size:13px;color:#666;margin-bottom:10px;}
+img{width:100%;border-radius:10px;margin:15px 0;}
+h2{margin-bottom:10px;}
+p{line-height:1.6;margin-bottom:10px;}
+.actions{margin-top:15px;display:flex;gap:10px;}
+.actions button{padding:6px 12px;border:none;border-radius:6px;background:#0b5ed7;color:#fff;cursor:pointer;}
+body.dark{background:#121212;color:white;}
+body.dark .meta{color:#ccc;}
+
+.breadcrumb{
+font-size:14px;
+margin-bottom:10px;
+}
+
+.breadcrumb a{
+text-decoration:none;
+color:#0b5ed7;
+font-weight:600;
+}
+
+.breadcrumb span{
+color:#666;
+margin:0 5px;
+}
+
+body.dark .breadcrumb a{color:#66aaff;}
+body.dark .breadcrumb span{color:#aaa;}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="headerTitle">Post</h1>
+<div class="controls">
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<div class="container">
+<a href="../index.html" class="back" id="backBtn">← Back</a>
+<div id="postBox"></div>
+</div>
+
+<script>
+// LANGUAGE
+const lang = localStorage.getItem("lang") || "en";
+function setLang(l){ localStorage.setItem("lang",l); location.reload(); }
+const TEXT = {
+ en:{header:"Blog Post", back:"← Back to Blog", share:"Share", copied:"Link copied!"},
+ ha:{header:"Cikakken Labari", back:"← Komawa", share:"Raba", copied:"An kwafi link!"}
+};
+document.getElementById("headerTitle").innerText = TEXT[lang].header;
+document.getElementById("backBtn").innerText = TEXT[lang].back;
+document.documentElement.lang = lang;
+
+// DARK MODE
+if(localStorage.getItem("dark")==="1"){document.body.classList.add("dark");}
+function toggleDark(){ const d = document.body.classList.toggle("dark"); localStorage.setItem("dark", d?"1":"0"); }
+
+// BLOG DATA
+const POSTS = [
+ {id:1, title:{en:"Commissioning of School Project",ha:"Kaddamar da Makaranta"}, img:"../../assets/images/school.jpg", content:{en:"Full content of school project.",ha:"Cikakken bayani na makaranta"}, date:"2026-01-10", category:"Education"},
+ {id:2, title:{en:"Healthcare Improvement",ha:"Inganta Lafiya"}, img:"../../assets/images/health.jpg", content:{en:"Full content of healthcare improvements.",ha:"Cikakken bayani na lafiya"}, date:"2026-01-05", category:"Health"},
+ {id:3, title:{en:"Road Construction",ha:"Gina Hanya"}, img:"../../assets/images/road.jpg", content:{en:"Full content of road construction.",ha:"Cikakken bayani na hanya"}, date:"2026-02-01", category:"Infrastructure"},
+ {id:4, title:{en:"New Library",ha:"Sabuwar Library"}, img:"../../assets/images/library.jpg", content:{en:"Full content of new library.",ha:"Cikakken bayani na library"}, date:"2026-02-10", category:"Education"}
+];
+
+// GET POST
+const postId = localStorage.getItem("postId");
+const post = POSTS.find(p=>p.id==postId);
+
+// RENDER POST
+function renderPost(){
+ if(!post){
+   document.getElementById("postBox").innerHTML = "<p>Post not found</p>";
+   return;
+ }
+ document.title = post.title[lang];
+ document.getElementById("postBox").innerHTML = `
+   <h2>${post.title[lang]}</h2>
+   <div class="meta">📅 ${post.date} | Category: ${post.category}</div>
+   <img src="${post.img}">
+   <p>${post.content[lang]}</p>
+   <div class="actions">
+     <button onclick="sharePost()">${TEXT[lang].share}</button>
+   </div>
+ `;
+}
+
+// SHARE FUNCTION
+function sharePost(){
+ const url = window.location.href;
+ navigator.clipboard.writeText(url);
+ alert(TEXT[lang].copied);
+}
+
+// INIT
+renderPost();
+</script>
+
+</body>
+</html>

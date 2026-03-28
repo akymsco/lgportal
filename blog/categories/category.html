@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog - Kankara LG Portal</title>
+
+<style>
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0;}
+
+body{background:#f5f7fa;color:#000;}
+
+header{
+background:#0b5ed7;
+color:#fff;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h1{font-size:20px;}
+
+.controls button{
+margin-left:5px;
+padding:5px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+nav{
+background:#0b5ed7;
+padding:10px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+nav a{
+text-decoration:none;
+color:#fff;
+font-weight:600;
+}
+
+.container{
+padding:15px;
+max-width:1200px;
+margin:auto;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:15px;
+margin-top:15px;
+}
+
+.card{
+background:#fff;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+padding:10px;
+cursor:pointer;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.card img{
+width:100%;
+height:140px;
+object-fit:cover;
+border-radius:8px;
+margin-bottom:8px;
+}
+
+.card h3{font-size:16px;}
+
+.card p{font-size:14px;color:#666;}
+
+.filters{
+margin-bottom:15px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.filters select{
+padding:5px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+/* BREADCRUMB */
+.breadcrumb{
+font-size:14px;
+margin-bottom:10px;
+}
+
+.breadcrumb a{
+text-decoration:none;
+color:#0b5ed7;
+font-weight:600;
+}
+
+.breadcrumb span{
+color:#666;
+margin:0 5px;
+}
+
+/* DARK */
+body.dark{background:#121212;color:white;}
+body.dark .card{background:#1e1e1e;}
+body.dark nav{background:#1e1e1e;}
+body.dark .card p{color:#ccc;}
+body.dark .breadcrumb a{color:#66aaff;}
+body.dark .breadcrumb span{color:#aaa;}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1 id="headerTitle">Blog</h1>
+
+<div class="controls">
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('ha')">HA</button>
+<button onclick="toggleDark()">🌙</button>
+</div>
+</header>
+
+<nav>
+<a href="../index.html">Home</a>
+<a href="search.html">🔎 Search</a>
+<a href="../people.html">People</a>
+<a href="../place.html">Place</a>
+<a href="../projects.html">Projects</a>
+<a href="../schools.html">Schools</a>
+<a href="../offices.html">Offices</a>
+<a href="../companies.html">Companies</a>
+<a href="../organizations.html">Organizations</a>
+</nav>
+
+<div class="container">
+
+<!-- ✅ BREADCRUMB -->
+<div class="breadcrumb">
+<a href="../index.html">Home</a>
+<span>›</span>
+<span>Blog</span>
+</div>
+
+<div class="filters">
+<select id="categoryFilter">
+<option value="">All Categories</option>
+</select>
+</div>
+
+<div id="blogGrid" class="grid"></div>
+
+</div>
+
+<script>
+
+// =======================
+// LANGUAGE
+// =======================
+const lang = localStorage.getItem("lang") || "en";
+
+function setLang(l){
+ localStorage.setItem("lang",l);
+ location.reload();
+}
+
+const TEXT = {
+ en:{header:"Blog", category:"Category"},
+ ha:{header:"Blog", category:"Rukuni"}
+};
+
+document.getElementById("headerTitle").innerText = TEXT[lang].header;
+document.documentElement.lang = lang;
+
+// =======================
+// DARK MODE
+// =======================
+if(localStorage.getItem("dark")==="1"){
+ document.body.classList.add("dark");
+}
+
+function toggleDark(){
+ const d = document.body.classList.toggle("dark");
+ localStorage.setItem("dark", d?"1":"0");
+}
+
+// =======================
+// POSTS DATA
+// =======================
+const POSTS = [
+ {id:1,title:{en:"Commissioning of School Project",ha:"Kaddamar da Makaranta"},img:"../assets/images/school.jpg",date:"2026-01-10",category:"Education"},
+ {id:2,title:{en:"Healthcare Improvement",ha:"Inganta Lafiya"},img:"../assets/images/health.jpg",date:"2026-01-05",category:"Health"},
+ {id:3,title:{en:"Road Construction",ha:"Gina Hanya"},img:"../assets/images/road.jpg",date:"2026-02-01",category:"Infrastructure"},
+ {id:4,title:{en:"New Library",ha:"Sabuwar Library"},img:"../assets/images/library.jpg",date:"2026-02-10",category:"Education"}
+];
+
+// =======================
+// POPULATE FILTER
+// =======================
+const categorySelect = document.getElementById("categoryFilter");
+
+const categories = [...new Set(POSTS.map(p=>p.category))];
+
+categories.forEach(c=>{
+ categorySelect.innerHTML += `<option value="${c}">${c}</option>`;
+});
+
+// =======================
+// RENDER BLOG
+// =======================
+function renderBlog(){
+
+ const selectedCat = categorySelect.value;
+
+ const filtered = POSTS.filter(p =>
+   !selectedCat || p.category === selectedCat
+ );
+
+ let html = "";
+
+ filtered.forEach(p=>{
+ html += `
+   <div class="card">
+     <img src="${p.img}" alt="${p.title[lang]}">
+
+     <h3 onclick="openPost(${p.id})">${p.title[lang]}</h3>
+
+     <p>
+       📅 ${p.date} |
+       <span onclick="openCategory('${p.category}')" style="color:#0b5ed7;cursor:pointer;">
+         ${p.category}
+       </span>
+     </p>
+   </div>
+ `;
+ });
+
+ document.getElementById("blogGrid").innerHTML = html;
+}
+
+// =======================
+// NAVIGATION (PRO)
+// =======================
+function openPost(id){
+ window.location.href = "post/post.html?id=" + id;
+}
+
+function openCategory(cat){
+ window.location.href = "categories/category.html?cat=" + cat;
+}
+
+// =======================
+// FILTER CHANGE
+// =======================
+categorySelect.addEventListener("change", renderBlog);
+
+// =======================
+// INIT
+// =======================
+renderBlog();
+
+</script>
+
+</body>
+</html>
