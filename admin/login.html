@@ -1,33 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ha">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Admin Login</title>
-
-<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.container{
+  background:#1e293b;
+  padding:30px;
+  border-radius:10px;
+  width:300px;
+}
+h1{text-align:center;margin-bottom:20px;}
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:5px;
+  background:#334155;
+  color:#fff;
+}
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:5px;
+  font-weight:bold;
+  cursor:pointer;
+  background:#22c55e;
+}
+button:hover{background:#16a34a;}
+#status{text-align:center;margin-top:10px;}
+</style>
 </head>
-
 <body>
 
 <div class="container">
-
-  <div class="card">
-    <h2>Admin Login</h2>
-
-    <input type="email" id="email" placeholder="Email"><br><br>
-    <input type="password" id="password" placeholder="Password"><br><br>
-
-    <button class="btn" onclick="login()">Login</button>
-
-    <p id="error" style="color:red;"></p>
-  </div>
-
+  <h1>Admin Login</h1>
+  <input type="text" id="username" placeholder="Username" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button onclick="login()">Login</button>
+  <div id="status"></div>
 </div>
 
-<script src="../assets/js/firebase.js"></script>
-<script src="admin.js"></script>
+<script>
+// ✅ HARD-CODED ADMIN
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
+
+function login(){
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const status = document.getElementById("status");
+
+  if(user === ADMIN_USER && pass === ADMIN_PASS){
+    localStorage.setItem("admin","1"); // mark as logged in
+    status.innerText = "✅ Login successful!";
+    setTimeout(()=> window.location.href="admin.html", 500);
+  }else{
+    status.innerText = "❌ Username ko Password bai dace ba!";
+  }
+}
+</script>
 
 </body>
 </html>

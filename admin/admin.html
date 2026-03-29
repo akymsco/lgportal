@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Admin</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:#fff;
+}
+.container{
+  max-width:600px;
+  margin:40px auto;
+  background:#1e293b;
+  padding:20px;
+  border-radius:10px;
+}
+h1{text-align:center;}
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:5px;
+  background:#334155;
+  color:#fff;
+}
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:5px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.publish{background:#22c55e;}
+.publish:hover{background:#16a34a;}
+.delete{background:#ef4444;}
+.delete:hover{background:#dc2626;}
+.logout{background:#64748b;}
+.preview img{
+  width:100%;
+  border-radius:8px;
+}
+#status{
+  margin-top:10px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>📰 News Admin (PRO)</h1>
+
+  <form id="form">
+    <input type="text" id="title" placeholder="News Title" required>
+    <textarea id="content" placeholder="News Content" required></textarea>
+
+    <!-- SLUG -->
+    <input type="text" id="slug" placeholder="slug-auto" readonly>
+
+    <!-- IMAGE -->
+    <input type="file" id="imageFile" accept="image/*">
+    <div class="preview" id="preview"></div>
+
+    <button class="publish" type="submit">Publish / Update</button>
+  </form>
+
+  <button class="delete" onclick="deletePost()">Delete Post</button>
+  <button class="logout" onclick="logout()">Logout</button>
+
+  <div id="status"></div>
+</div>
+
+<script>
+// =======================
+// AUTH
+// =======================
+if(localStorage.getItem("admin") !== "1"){
+  location.href = "login.html";
+}
+
+function logout(){
+  localStorage.removeItem("admin");
+  location.href = "login.html";
+}
+
+// =======================
+// GLOBAL STATE
+// =======================
+let imageBase64 = "";
+let editMode = false;
+let currentSlug = "";
+
+// =======================
+// AUTO SLUG
+// =======================
+document.getElementById("title").addEventListener("input", ()=>{
+  if(editMode) return;
+
+  const slug = document.getElementById("title").value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-|-$/g,"");
+
+  document.getElementById("slug").value = slug;
+});
+
+// =======================
+// IMAGE PREVIEW
+// =======================
+document.getElementById("imageFile").addEventListener("change", function(){
+  const file = this.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(){
+    imageBase64 = reader.result;
+    document.getElementById("preview").innerHTML =
+      `<img src="${imageBase64}">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+// =======================
+// LOAD FOR EDIT (AUTO)
+// =======================
+const params = new URLSearchParams(location.search);
+const editSlug = params.get("edit");
+
+if(editSlug){
+  loadForEdit(editSlug);
+}
+
+async function loadForEdit(slug){
+  try{
+    const res = await fetch(`../blog/news/${slug}.json`);
+    const post = await res.json();
+
+    document.getElementById("title").value = post.title;
+    document.getElementById("content").value = post.content;
+    document.getElementById("slug").value = post.slug;
+
+    imageBase64 = post.image || "";
+
+    if(post.image){
+      document.getElementById("preview").innerHTML =
+        `<img src="${post.image}">`;
+    }
+
+    editMode = true;
+    currentSlug = slug;
+
+  }catch{
+    alert("Failed to load post");
+  }
+}
+
+// =======================
+// SUBMIT (CREATE / UPDATE)
+// =======================
+const form = document.getElementById("form");
+const statusBox = document.getElementById("status");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+  const slug = document.getElementById("slug").value;
+
+  statusBox.innerText = "⏳ Processing...";
+
+  const endpoint = editMode
+    ? "/.netlify/functions/update"
+    : "/.netlify/functions/publish";
+
+  try{
+    const res = await fetch(endpoint,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        title,
+        content,
+        image: imageBase64,
+        slug: editMode ? currentSlug : slug
+      })
+    });
+
+    if(res.ok){
+      statusBox.innerText = editMode
+        ? "✅ Updated!"
+        : "✅ Published!";
+
+      form.reset();
+      document.getElementById("preview").innerHTML = "";
+      imageBase64 = "";
+      editMode = false;
+
+    }else{
+      statusBox.innerText = "❌ Failed";
+    }
+
+  }catch(err){
+    statusBox.innerText = "❌ Error: " + err.message;
+  }
+});
+
+// =======================
+// DELETE
+// =======================
+async function deletePost(){
+
+  if(!editMode){
+    alert("Load post first!");
+    return;
+  }
+
+  if(!confirm("Delete this post?")) return;
+
+  const res = await fetch("/.netlify/functions/delete",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ slug: currentSlug })
+  });
+
+  if(res.ok){
+    alert("Deleted!");
+    location.href = "dashboard.html";
+  }else{
+    alert("Delete failed");
+  }
+}
+</script>
+
+</body>
+</html>
