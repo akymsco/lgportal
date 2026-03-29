@@ -1,34 +1,64 @@
-import fetch from "node-fetch";
+import 'dotenv/config'; // load .env variables
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const OWNER = "akymsco";
+const REPO = "lgportal";
+const BASE_PATH = "myproject/blog/news";
 
 export async function handler(event) {
-  const { title, content, image, slug } = JSON.parse(event.body);
+  const data = JSON.parse(event.body);
 
-  const repo = "akymsco/lgportal";
-  const path = `myproject/blog/news/${slug}.json`;
+  // example slug creation
+  const slug = data.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/(^-|-$)/g,"");
 
-  // get SHA
-  const file = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`)
-    .then(res => res.json());
+  // create post data
+  const postData = {
+    title: data.title,
+    content: data.content,
+    image: data.image || "",
+    date: new Date().toISOString(),
+    slug
+  };
 
-  const updated = { title, content, image, date: new Date(), slug };
+  // fetch index.json from GitHub
+  const indexRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
+    headers: { Authorization: `token ${GITHUB_TOKEN}` }
+  });
 
-  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-    method:"PUT",
-    headers:{
-      Authorization:`token ${process.env.GITHUB_TOKEN}`,
-      "Content-Type":"application/json"
-    },
+  const indexFile = await indexRes.json();
+  const indexContent = JSON.parse(Buffer.from(indexFile.content, "base64").toString());
+
+  // add new post
+  indexContent.push({
+    title: postData.title,
+    slug,
+    date: postData.date,
+    image: postData.image
+  });
+
+  // update index.json
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
+    method: "PUT",
+    headers: { Authorization: `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      message: `Publish ${title}`,
-      content: Buffer.from(JSON.stringify(updated)).toString("base64"),
-      sha: file.sha || undefined
+      message: `Add post ${slug}`,
+      content: Buffer.from(JSON.stringify(indexContent, null, 2)).toString("base64"),
+      sha: indexFile.sha
     })
   });
 
-  if(res.ok){
-    return { statusCode: 200, body: "Published" };
-  }else{
-    const err = await res.text();
-    return { statusCode: 500, body: err };
-  }
+  // create individual post JSON
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${slug}.json`, {
+    method: "PUT",
+    headers: { Authorization: `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: `Create post ${slug}`,
+      content: Buffer.from(JSON.stringify(postData, null, 2)).toString("base64")
+    })
+  });
+
+  return { statusCode: 200, body: JSON.stringify({ success: true }) };
 }

@@ -1,70 +1,59 @@
-exports.handler = async (event) => {
+import 'dotenv/config';
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const OWNER = "akymsco";
 const REPO = "lgportal";
 const BASE_PATH = "myproject/blog/news";
 
-const {slug} = JSON.parse(event.body);
+exports.handler = async (event) => {
+  try {
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    const data = JSON.parse(event.body);
+    const slug = data.slug;
 
-// ===================
-// GET POST FILE
-// ===================
-const postRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${slug}.json`, {
-  headers:{Authorization:`token ${GITHUB_TOKEN}`}
-});
+    if(!slug) throw new Error("Slug is required for deletion");
 
-const postFile = await postRes.json();
+    // Get index.json
+    const indexRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
+      headers:{ Authorization: `token ${GITHUB_TOKEN}` }
+    });
+    const indexFile = await indexRes.json();
+    let indexContent = JSON.parse(Buffer.from(indexFile.content,"base64").toString());
 
-// ===================
-// DELETE POST FILE
-// ===================
-await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${slug}.json`, {
-  method:"DELETE",
-  headers:{
-    Authorization:`token ${GITHUB_TOKEN}`,
-    "Content-Type":"application/json"
-  },
-  body: JSON.stringify({
-    message:"Delete post",
-    sha: postFile.sha
-  })
-});
+    // Remove post
+    indexContent = indexContent.filter(p => p.slug !== slug);
 
-// ===================
-// UPDATE INDEX
-// ===================
-const indexRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
-  headers:{Authorization:`token ${GITHUB_TOKEN}`}
-});
+    // Update index.json
+    await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
+      method:"PUT",
+      headers:{
+        Authorization: `token ${GITHUB_TOKEN}`,
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        message: `Delete post ${slug}`,
+        content: Buffer.from(JSON.stringify(indexContent,null,2)).toString("base64"),
+        sha: indexFile.sha
+      })
+    });
 
-const indexFile = await indexRes.json();
+    // Delete post file
+    const postRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${slug}.json`, {
+      headers:{ Authorization:`token ${GITHUB_TOKEN}` }
+    });
+    const postFile = await postRes.json();
 
-let indexContent = JSON.parse(
-  Buffer.from(indexFile.content,"base64").toString()
-);
+    await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${slug}.json`, {
+      method:"DELETE",
+      headers:{ Authorization:`token ${GITHUB_TOKEN}` },
+      body: JSON.stringify({
+        message: `Delete post ${slug}`,
+        sha: postFile.sha
+      })
+    });
 
-indexContent = indexContent.filter(n=> n.slug !== slug);
+    return { statusCode:200, body: JSON.stringify({ success:true, slug }) };
 
-// ===================
-// SAVE NEW INDEX
-// ===================
-await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/index.json`, {
-  method:"PUT",
-  headers:{
-    Authorization:`token ${GITHUB_TOKEN}`,
-    "Content-Type":"application/json"
-  },
-  body: JSON.stringify({
-    message:"Remove post",
-    content: Buffer.from(JSON.stringify(indexContent,null,2)).toString("base64"),
-    sha: indexFile.sha
-  })
-});
-
-return {
-  statusCode:200,
-  body: JSON.stringify({success:true})
-};
-
+  } catch(err) {
+    return { statusCode:500, body: JSON.stringify({ success:false, error: err.message }) };
+  }
 };
