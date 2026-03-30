@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>News Admin</title>
+<title>Admin Dashboard</title>
 
 <style>
 body{
@@ -13,13 +13,15 @@ body{
   color:#fff;
 }
 .container{
-  max-width:600px;
-  margin:40px auto;
+  max-width:800px;
+  margin:20px auto;
   background:#1e293b;
   padding:20px;
   border-radius:10px;
 }
-h1{text-align:center;}
+h1{
+  text-align:center;
+}
 input,textarea{
   width:100%;
   padding:10px;
@@ -30,26 +32,40 @@ input,textarea{
   color:#fff;
 }
 button{
-  width:100%;
-  padding:12px;
+  padding:10px 15px;
   margin-top:10px;
   border:none;
   border-radius:5px;
   font-weight:bold;
   cursor:pointer;
 }
-.publish{background:#22c55e;}
-.publish:hover{background:#16a34a;}
-.delete{background:#ef4444;}
-.delete:hover{background:#dc2626;}
-.logout{background:#64748b;}
-.preview img{
-  width:100%;
-  border-radius:8px;
-}
+button.publish{background:#22c55e;}
+button.publish:hover{background:#16a34a;}
+button.delete{background:#ef4444;}
+button.delete:hover{background:#dc2626;}
+button.logout{background:#f97316;}
+button.logout:hover{background:#ea580c;}
 #status{
   margin-top:10px;
   text-align:center;
+}
+.preview img{
+  width:100%;
+  border-radius:8px;
+  margin-top:10px;
+}
+.post-list{
+  margin-top:20px;
+}
+.post-item{
+  background:#334155;
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:5px;
+  cursor:pointer;
+}
+.post-item:hover{
+  background:#3b5066;
 }
 </style>
 </head>
@@ -57,65 +73,62 @@ button{
 <body>
 
 <div class="container">
-  <h1>📰 News Admin (PRO)</h1>
+  <h1>📰 Admin Dashboard</h1>
 
   <form id="form">
     <input type="text" id="title" placeholder="News Title" required>
     <textarea id="content" placeholder="News Content" required></textarea>
-
-    <!-- SLUG -->
-    <input type="text" id="slug" placeholder="slug-auto" readonly>
-
-    <!-- IMAGE -->
     <input type="file" id="imageFile" accept="image/*">
     <div class="preview" id="preview"></div>
-
-    <button class="publish" type="submit">Publish / Update</button>
+    <input type="text" id="slug" placeholder="Slug (auto)" readonly>
+    <button type="submit" class="publish">Publish / Update</button>
+    <button type="button" class="delete" onclick="deletePost()">Delete Post</button>
   </form>
 
-  <button class="delete" onclick="deletePost()">Delete Post</button>
   <button class="logout" onclick="logout()">Logout</button>
-
   <div id="status"></div>
-</div>
+
+  <div class="post-list" id="postList">
+    <h3>📄 Existing Posts</h3>
+  </div>
+</div>'
 
 <script>
 // =======================
-// AUTH
+// PROTECT ADMIN
 // =======================
 if(localStorage.getItem("admin") !== "1"){
-  location.href = "login.html";
+  window.location.href = "login.html";
 }
 
+// =======================
+// LOGOUT
+// =======================
 function logout(){
   localStorage.removeItem("admin");
-  location.href = "login.html";
+  window.location.href = "login.html";
 }
 
 // =======================
-// GLOBAL STATE
+// SLUG
 // =======================
-let imageBase64 = "";
-let editMode = false;
-let currentSlug = "";
-
-// =======================
-// AUTO SLUG
-// =======================
-document.getElementById("title").addEventListener("input", ()=>{
-  if(editMode) return;
-
-  const slug = document.getElementById("title").value
-    .toLowerCase()
+function generateSlug(text){
+  return text.toLowerCase()
     .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-|-$/g,"");
+    .replace(/(^-|-$)/g,"");
+}
 
-  document.getElementById("slug").value = slug;
+document.getElementById("title").addEventListener("input", function(){
+  if(!editMode){
+    document.getElementById("slug").value = generateSlug(this.value);
+  }
 });
 
 // =======================
-// IMAGE PREVIEW
+// IMAGE
 // =======================
+let imageBase64 = "";
+
 document.getElementById("imageFile").addEventListener("change", function(){
   const file = this.files[0];
   if(!file) return;
@@ -123,48 +136,110 @@ document.getElementById("imageFile").addEventListener("change", function(){
   const reader = new FileReader();
   reader.onload = function(){
     imageBase64 = reader.result;
-    document.getElementById("preview").innerHTML =
-      `<img src="${imageBase64}">`;
+    document.getElementById("preview").innerHTML = `<img src="${imageBase64}">`;
   };
   reader.readAsDataURL(file);
 });
 
 // =======================
-// LOAD FOR EDIT (AUTO)
+// STATE
 // =======================
-const params = new URLSearchParams(location.search);
-const editSlug = params.get("edit");
+let editMode = false;
+let currentSlug = "";
 
-if(editSlug){
-  loadForEdit(editSlug);
-}
-
-async function loadForEdit(slug){
+// =======================
+// LOAD POSTS
+// =======================
+async function loadPostList(){
   try{
-    const res = await fetch(`../blog/news/${slug}.json`);
-    const post = await res.json();
+    const res = await fetch("https://raw.githubusercontent.com/akymsco/lgportal/main/myproject/blog/news/index.json");
+    const posts = await res.json();
 
-    document.getElementById("title").value = post.title;
-    document.getElementById("content").value = post.content;
-    document.getElementById("slug").value = post.slug;
+    const listEl = document.getElementById("postList");
+    listEl.innerHTML = "<h3>📄 Existing Posts</h3>";
 
-    imageBase64 = post.image || "";
+    posts.reverse().forEach(p=>{
+      const div = document.createElement("div");
+      div.className = "post-item";
+      div.innerText = p.title;
 
-    if(post.image){
-      document.getElementById("preview").innerHTML =
-        `<img src="${post.image}">`;
-    }
+      div.onclick = ()=> loadForEdit(p.slug);
 
-    editMode = true;
-    currentSlug = slug;
+      listEl.appendChild(div);
+    });
 
-  }catch{
-    alert("Failed to load post");
+  }catch(err){
+    console.error(err);
   }
 }
 
 // =======================
-// SUBMIT (CREATE / UPDATE)
+// LOAD EDIT
+// =======================
+async function loadForEdit(slug){
+  const res = await fetch(`https://raw.githubusercontent.com/akymsco/lgportal/main/myproject/blog/news/${slug}.json`);
+  const post = await res.json();
+
+  document.getElementById("title").value = post.title;
+  document.getElementById("content").value = post.content;
+  document.getElementById("slug").value = slug;
+
+  imageBase64 = post.image || "";
+  document.getElementById("preview").innerHTML = post.image ? `<img src="${post.image}">` : "";
+
+  editMode = true;
+  currentSlug = slug;
+
+  document.getElementById("status").innerText = "✏️ Editing: " + slug;
+}
+
+// =======================
+// DELETE
+// =======================
+async function deletePost(){
+  if(!editMode){
+    alert("Load post first!");
+    return;
+  }
+
+  if(!confirm("Delete this post?")) return;
+
+  try{
+    const res = await fetch("/.netlify/functions/delete", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ slug: currentSlug })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      alert("✅ Deleted!");
+      resetForm();
+      loadPostList();
+    }else{
+      alert("❌ " + (data.error || "Delete failed"));
+    }
+
+  }catch(err){
+    alert("❌ " + err.message);
+  }
+}
+
+// =======================
+// RESET
+// =======================
+function resetForm(){
+  document.getElementById("form").reset();
+  document.getElementById("preview").innerHTML = "";
+  document.getElementById("slug").value = "";
+  imageBase64 = "";
+  editMode = false;
+  currentSlug = "";
+}
+
+// =======================
+// SUBMIT
 // =======================
 const form = document.getElementById("form");
 const statusBox = document.getElementById("status");
@@ -174,15 +249,16 @@ form.addEventListener("submit", async (e)=>{
 
   const title = document.getElementById("title").value;
   const content = document.getElementById("content").value;
-  const slug = document.getElementById("slug").value;
+
+  let slug = editMode ? currentSlug : generateSlug(title);
 
   statusBox.innerText = "⏳ Processing...";
 
-  const endpoint = editMode
-    ? "/.netlify/functions/update"
-    : "/.netlify/functions/publish";
-
   try{
+    const endpoint = editMode 
+      ? "/.netlify/functions/update" 
+      : "/.netlify/functions/publish";
+
     const res = await fetch(endpoint,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -190,54 +266,29 @@ form.addEventListener("submit", async (e)=>{
         title,
         content,
         image: imageBase64,
-        slug: editMode ? currentSlug : slug
+        slug
       })
     });
 
-    if(res.ok){
-      statusBox.innerText = editMode
-        ? "✅ Updated!"
-        : "✅ Published!";
+    const data = await res.json();
 
-      form.reset();
-      document.getElementById("preview").innerHTML = "";
-      imageBase64 = "";
-      editMode = false;
-
+    if(data.success){
+      statusBox.innerText = editMode ? "✅ Updated!" : "✅ Published!";
+      resetForm();
+      loadPostList();
     }else{
-      statusBox.innerText = "❌ Failed";
+      statusBox.innerText = "❌ " + (data.error || "Failed");
     }
 
   }catch(err){
-    statusBox.innerText = "❌ Error: " + err.message;
+    statusBox.innerText = "❌ " + err.message;
   }
 });
 
 // =======================
-// DELETE
+// INIT
 // =======================
-async function deletePost(){
-
-  if(!editMode){
-    alert("Load post first!");
-    return;
-  }
-
-  if(!confirm("Delete this post?")) return;
-
-  const res = await fetch("/.netlify/functions/delete",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ slug: currentSlug })
-  });
-
-  if(res.ok){
-    alert("Deleted!");
-    location.href = "dashboard.html";
-  }else{
-    alert("Delete failed");
-  }
-}
+loadPostList();
 </script>
 
 </body>
